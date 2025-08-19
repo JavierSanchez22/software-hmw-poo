@@ -1,19 +1,27 @@
-import { Post } from './posts';
+import { PostTitle } from '../utils/post-title';
+import { PostDescription } from '../utils/post-description';
+import { PostAuthor } from '../utils/post-author';
 
 export class PostValidator {
     validate(title: string, description: string, author: string): { isValid: boolean; errors: string[] } {
         const errors: string[] = [];
 
-        if (!Post.isValidTitle(title)) {
-            errors.push('Invalid Title');
+        try {
+            PostTitle.create(title);
+        } catch (error) {
+            errors.push(error instanceof Error ? error.message : 'Invalid Title');
         }
 
-        if (!Post.isValidDescription(description)) {
-            errors.push('Invalid Description');
+        try {
+            PostDescription.create(description);
+        } catch (error) {
+            errors.push(error instanceof Error ? error.message : 'Invalid Description');
         }
 
-        if (!Post.isValidAuthor(author)) {
-            errors.push('Invalid Author');
+        try {
+            PostAuthor.create(author);
+        } catch (error) {
+            errors.push(error instanceof Error ? error.message : 'Invalid Author');
         }
 
         return {

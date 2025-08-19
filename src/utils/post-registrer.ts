@@ -1,6 +1,6 @@
 import postgres from 'postgres';
-import { PostValidator } from './post-validator';
-import { Post } from './posts';
+import { PostValidator } from '../utils/post-validator';
+import { Post } from '../utils/posts';
 
 export class PostRegistrer {
     private sql = postgres('postgresql://postgres.paigqspqcrcpmekowghr:S@nchez695313@aws-1-us-east-2.pooler.supabase.com:6543/postgres');
@@ -29,17 +29,25 @@ export class PostRegistrer {
             };
         }
 
-        const post = new Post(title, description, author);
-        await this.sql`INSERT INTO post (title, description, author) VALUES (${post.title}, ${post.description}, ${post.author})`;
-        console.log('Data inserted successfully');
+        try {
+            const post = Post.create(title, description, author);
+            await this.sql`INSERT INTO post (title, description, author) VALUES (${post.getTitle()}, ${post.getDescription()}, ${post.getAuthor()})`;
+            console.log('Data inserted successfully');
 
-        console.log('Is valid title: ', post.title);
-        console.log('Is valid description: ', post.description);
-        console.log('Is valid author: ', post.author);
+            console.log('Is valid title: ', post.getTitle());
+            console.log('Is valid description: ', post.getDescription());
+            console.log('Is valid author: ', post.getAuthor());
 
-        return {
-            success: true,
-            message: 'Post registered successfully'
-        };
+            return {
+                success: true,
+                message: 'Post registered successfully'
+            };
+        } catch (error) {
+            return {
+                success: false,
+                message: 'Failed to create post',
+                errors: [error instanceof Error ? error.message : 'Unknown error']
+            };
+        }
     }
 }
