@@ -1,11 +1,12 @@
-import postgres from 'postgres';
-import { PostValidator } from '../utils/post-validator';
-import { Post } from '../utils/posts';
+import { PostValidator } from './post-validator';
+import { Post } from './posts';
+import { PostRepositoryInterface } from './post-repository-interface';
 
 export class PostRegistrer {
-    private sql = postgres('postgresql://postgres.paigqspqcrcpmekowghr:S@nchez695313@aws-1-us-east-2.pooler.supabase.com:6543/postgres');
-    
-    constructor(private postValidator: PostValidator) {}
+    constructor(
+        private postValidator: PostValidator,
+        private postRepository: PostRepositoryInterface
+    ) {}
 
     async register(title: string, description: string, author: string): Promise<{ success: boolean; message: string; errors?: string[] }> {
         console.log('Received Title: ', title);
@@ -31,8 +32,7 @@ export class PostRegistrer {
 
         try {
             const post = Post.create(title, description, author);
-            await this.sql`INSERT INTO post (title, description, author) VALUES (${post.getTitle()}, ${post.getDescription()}, ${post.getAuthor()})`;
-            console.log('Data inserted successfully');
+            await this.postRepository.save(post);
 
             console.log('Is valid title: ', post.getTitle());
             console.log('Is valid description: ', post.getDescription());
