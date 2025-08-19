@@ -50,6 +50,8 @@ export async function POST(request: NextRequest) {
             }, { status: 400 });
         }
         const sql = postgres('postgresql://postgres.paigqspqcrcpmekowghr:S@nchez695313@aws-1-us-east-2.pooler.supabase.com:6543/postgres');
+        await sql`INSERT INTO articles (title, description, author) VALUES (${data.title}, ${data.description}, ${data.author})`;
+        console.log('Data inserted successfully');
         
     } else {
         return NextResponse.json({
