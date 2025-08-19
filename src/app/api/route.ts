@@ -1,4 +1,6 @@
+import postgres from 'postgres';
 import { NextResponse, NextRequest } from 'next/server';
+
 
 export async function POST(request: NextRequest) {
     const data = await request.json();
@@ -47,6 +49,7 @@ export async function POST(request: NextRequest) {
                 }
             }, { status: 400 });
         }
+        const sql = postgres('postgresql://postgres.paigqspqcrcpmekowghr:S@nchez695313@aws-1-us-east-2.pooler.supabase.com:6543/postgres');
         
     } else {
         return NextResponse.json({
