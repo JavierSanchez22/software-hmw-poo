@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
         console.log('Received Author: ', data.author)
         
         if (typeof data.title == 'string' && typeof data.description == 'string' && typeof data.author == 'string') {
-            if (data.title.length >= 5 && data.title.length <= 100 && data.title.trim() !== '' && data.title != null) {
+            if (isValidTitle(data.title)) {
                 console.log('Is valid title: ', data.title);
             } else {
                 return NextResponse.json({
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
                 }, { status: 400 });
             }
             
-            if (data.description.length >= 10 && data.description.length <= 500 && data.description.trim() !== '' && data.description != null) {
+            if (isValidDescription(data.description)) {
                 console.log('Is valid description: ', data.description);
             } else {
                 return NextResponse.json({
@@ -29,8 +29,7 @@ export async function POST(request: NextRequest) {
                 }, { status: 400 });
             }
             
-            const authorRegex = /^[A-ZÁÉÍÓÚÑÜ][A-Za-záéíóúñü'\-.]+(?: [A-Za-záéíóúñü'\-\.]+)*$/;
-            if (authorRegex.test(data.author)) {
+            if (isValidAuthor(data.author)) {
                 console.log('Is valid author: ', data.author);
             } else {
                 return NextResponse.json({
@@ -38,6 +37,8 @@ export async function POST(request: NextRequest) {
                     author: data.author 
                 }, { status: 400 });
             }
+            
+            await saveToDatabase(data.title, data.description, data.author);
             
         } else {
             return NextResponse.json({
@@ -49,10 +50,7 @@ export async function POST(request: NextRequest) {
                 }
             }, { status: 400 });
         }
-        const sql = postgres('postgresql://postgres.paigqspqcrcpmekowghr:S@nchez695313@aws-1-us-east-2.pooler.supabase.com:6543/postgres');
-        await sql`INSERT INTO articles (title, description, author) VALUES (${data.title}, ${data.description}, ${data.author})`;
-        console.log('Data inserted successfully');
-        
+
     } else {
         return NextResponse.json({
             message: 'Missing required fields: title, description, author'
@@ -63,4 +61,23 @@ export async function POST(request: NextRequest) {
         message: 'Data is valid',
         data
     });
+}
+
+function isValidTitle(title: string): boolean {
+    return typeof title === 'string' && title.length >= 5 && title.length <= 100 && title.trim() !== '' && title != null;
+}
+
+function isValidDescription(description: string): boolean {
+    return typeof description === 'string' && description.length >= 10 && description.length <= 500 && description.trim() !== '' && description != null;
+}
+
+function isValidAuthor(author: string): boolean {
+    const authorRegex = /^[A-ZÁÉÍÓÚÑÜ][A-Za-záéíóúñü'\-.]+(?: [A-Za-záéíóúñü'\-\.]+)*$/;
+    return typeof author === 'string' && authorRegex.test(author);
+}
+
+async function saveToDatabase(title: string, description: string, author: string): Promise<void> {
+    const sql = postgres('postgresql://postgres.paigqspqcrcpmekowghr:S@nchez695313@aws-1-us-east-2.pooler.supabase.com:6543/postgres');
+    await sql`INSERT INTO post (title, description, author) VALUES (${title}, ${description}, ${author})`;
+    console.log('Data inserted successfully');
 }
