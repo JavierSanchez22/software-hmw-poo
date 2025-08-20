@@ -38,3 +38,27 @@ export async function POST(request: NextRequest) {
         }
     });
 }
+
+export async function GET(){
+    try {
+        const postRepository = new PostRepositoryPostgres();
+        // const postRepository = new PostRepositoryInMemory();
+
+        const posts = await postRepository.findAll();
+        const postsData = posts.map(post => ({
+            title: post.getTitle(),
+            description: post.getDescription(),
+            author: post.getAuthor()
+        }));
+
+        return NextResponse.json({
+            message: 'Post retrieved successfully',
+            data: postsData
+        });
+    } catch (error) {
+        return NextResponse.json({
+            message: 'Failed to retrieve posts',
+            error: error instanceof Error ? error.message: 'Unknown Error'
+        })
+    }
+}

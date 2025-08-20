@@ -11,7 +11,7 @@ export class PostRepositoryPostgres implements PostRepositoryInterface {
     }
 
     async findAll(): Promise<Post[]> {
-        const result = await this.sql`SELECT * FROM posts`;
+        const result = await this.sql`SELECT * FROM post`;
         return result.map(row => Post.create(row.title, row.description, row.author));
     }
 
