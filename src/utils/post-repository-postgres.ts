@@ -20,4 +20,10 @@ export class PostRepositoryPostgres implements PostRepositoryInterface {
         if (result.length === 0) return null;
         return Post.create(result[0].title, result[0].description, result[0].author);
     }
+
+    async update(id: string, post: Post): Promise<void> {
+        await this.sql`UPDATE post SET title = ${post.getTitle()}, description = ${post.getDescription()}, author = ${post.getAuthor()}
+                        WHERE id = ${id}`;
+        console.log('Data update successfully');
+    }
 }
