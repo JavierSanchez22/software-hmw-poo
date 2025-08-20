@@ -26,4 +26,9 @@ export class PostRepositoryPostgres implements PostRepositoryInterface {
                         WHERE id = ${id}`;
         console.log('Data update successfully');
     }
+
+    async delete(id: string): Promise<void> {
+        await this.sql`DELETE FROM post WHERE id = ${id}`;
+        console.log('Data deleted successfully')
+    }
 }

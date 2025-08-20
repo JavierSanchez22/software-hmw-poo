@@ -26,4 +26,14 @@ export class PostRepositoryInMemory implements PostRepositoryInterface {
             throw new Error('Post not found');
         }
     }
+
+    async delete(id: string): Promise<void> {
+        const index = parseInt(id);
+        if (index >= 0 && index < this.posts.length) {
+            this.posts.splice(index, 1);
+            console.log('Data deleted from memory');
+        } else {
+            throw new Error('Post not found')
+        }
+    }
 }

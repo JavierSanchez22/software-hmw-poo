@@ -114,3 +114,37 @@ export async function PUT(request: NextRequest){
         }, {status: 500});
     }
 }
+
+export async function DELETE(request: NextRequest) {
+    try {
+        const { searchParams } = new URL(request.url);
+        const id = searchParams.get('id');
+
+        if (!id) {
+            return NextResponse.json({
+                message: 'ID parameter is required',
+            }, { status: 400 });
+        }
+
+        const postRepository = new PostRepositoryPostgres();
+        // const postRepository = new PostRepositoryInMemory();
+
+        const existingPost = await postRepository.findById(id);
+        if (!existingPost) {
+            return NextResponse.json({
+                mesage: 'Post not found'
+            }, { status: 404 });
+        }
+
+        await postRepository.delete(id);
+
+        return NextResponse.json({
+            message: 'Post deleted successfully'
+        });
+    } catch (error) {
+        return NextResponse.json({
+            message: 'Failed to delete post',
+            error: error instanceof Error ? error.message: 'Unknow Error'
+        }, { status: 500 });
+    }
+}
